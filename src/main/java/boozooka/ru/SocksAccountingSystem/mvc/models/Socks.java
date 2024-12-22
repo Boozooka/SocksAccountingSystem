@@ -28,4 +28,17 @@ public class Socks {
 
     @Column(name = "count", nullable = false)
     private Integer count;
+
+    public void addCount(Integer countAdd){
+        count += countAdd;
+    }
+
+    public boolean reduceCount(Integer countReduce){
+        if (count < countReduce){
+            return false;
+        } else {
+            count -= countReduce;
+            return true;
+        }
+    }
 }

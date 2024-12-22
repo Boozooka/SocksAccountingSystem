@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SocksUpdateRequest {
-    Long updatingId;
-    String updatingColumn;
-    String newValue;
+    private String updatingColumn;
+    private String newValue;
 }

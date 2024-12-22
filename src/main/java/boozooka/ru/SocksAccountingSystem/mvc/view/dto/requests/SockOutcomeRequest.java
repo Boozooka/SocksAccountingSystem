@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SockOutcomeRequest {
-    String color;
-    Integer cottonPercentage;
-    Integer count;
+    private String color;
+    private Integer cottonPercentage;
+    private Integer count;
 }

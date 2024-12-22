@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.File;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SockIncomeRequest {
-    private String color;
-    private Integer cottonPercentage;
-    private Integer count;
+public class CsvBatchRequest {
+    private File csvContent;
 }
