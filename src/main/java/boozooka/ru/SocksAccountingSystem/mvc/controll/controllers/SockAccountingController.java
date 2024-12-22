@@ -12,14 +12,15 @@ import boozooka.ru.SocksAccountingSystem.mvc.view.dto.responses.SuccessFileReadi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RestController(value = "/api/socks")
+@RestController()
+@RequestMapping("/api/socks")
 public class SockAccountingController implements SockAccountingControllerInterface {
 
     @Autowired
     SockAccountingServiceInterface service;
 
     @Override
-    @PostMapping(value = "/income")
+    @PostMapping("/income")
     public SocksResponse socksIncome(@RequestBody SockIncomeRequest request) {
         if (request.getCottonPercentage() < 0 || request.getCottonPercentage() > 100){
             throw new InvalidRequestException("Cotton percentage must be between 0 and 100");
