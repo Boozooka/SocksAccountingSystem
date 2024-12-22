@@ -10,6 +10,7 @@ import boozooka.ru.SocksAccountingSystem.mvc.models.Socks;
 import boozooka.ru.SocksAccountingSystem.mvc.view.dto.requests.*;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,9 @@ import java.util.List;
 
 @Service
 public class SockAccountingService implements SockAccountingServiceInterface {
+
+    @Autowired
+    Logger logger;
 
     @Autowired
     SocksJpaRepository socksRepository;
@@ -37,8 +41,13 @@ public class SockAccountingService implements SockAccountingServiceInterface {
             currentSocks.setColor(request.getColor());
             currentSocks.setCount(request.getCount());
             currentSocks.setCottonPercentage(request.getCottonPercentage());
+
+            logger.info("Added new type of socks: color = " + request.getColor() +
+                    ", cotton percentage = " + request.getCottonPercentage() +
+                    ", current count = " + request.getCount());
         } else {
             currentSocks.addCount(request.getCount());
+            logger.info("Income socks with id = " + currentSocks.getId() + " in the amount of " + request.getCount());
         }
 
         socksRepository.save(currentSocks);
@@ -63,6 +72,7 @@ public class SockAccountingService implements SockAccountingServiceInterface {
                     + request.getCottonPercentage());
         } else {
             socksRepository.save(currentSocks);
+            logger.info("Outcome socks with id = " + currentSocks.getId() + " in the amount of " + request.getCount());
             return currentSocks;
         }
     }
@@ -134,6 +144,8 @@ public class SockAccountingService implements SockAccountingServiceInterface {
                         "'cottonPercentage' or 'count'");
         }
         socksRepository.save(updatingSocks);
+        logger.info("Updated socks with id = " + updatingSocks.getId() + ", updated column = " + request.getUpdatingColumn() +
+                ", new value = " + request.getNewValue());
         return updatingSocks;
     }
 
