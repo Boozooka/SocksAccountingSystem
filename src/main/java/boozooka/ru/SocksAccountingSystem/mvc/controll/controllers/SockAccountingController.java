@@ -56,6 +56,15 @@ public class SockAccountingController implements SockAccountingControllerInterfa
     @Override
     @GetMapping("")
     public FilterSocksResponse getSocksBy(@RequestBody GetAmountOfFilterSocksRequest request) {
+        if (request.getCottonPercentage() != null &&
+                (request.getCottonPercentage() < 0 || request.getCottonPercentage() > 100)){
+            throw new InvalidRequestException("Cotton percentage must be between 0 and 100");
+        }
+
+        if (request.getCountEquals() <= 0 || request.getCountLessThan() <= 0 || request.getCountMoreThan() < 0){
+            throw new InvalidRequestException("Count of socks must be more than 0");
+        }
+
         Integer result = service.getSocksBy(request);
         return new FilterSocksResponse(result);
     }

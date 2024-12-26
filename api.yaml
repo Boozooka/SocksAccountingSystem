@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: Система учёта носков на складе OpenAPI спецификация
+  version: 0.1.1
+servers:
+  - url: http://localhost:8080/api/socks
+    description: Main server
+paths:
+  /income:
+    post:
+      summary: Приход партии носков
+      tags:
+        - Socks
+      operationId: socksIncome
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SocksIncomeRequest"
+      responses:
+        '200':
+          description: Успешное внесение прихода, возврат текущего состояния носков (Объект Socks)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Socks"
+        '400':
+          description: Некорректные типы данных в запросе
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exception"
+  /outcome:
+    post:
+      summary: Отпуск партии носков
+      tags:
+        - Socks
+      operationId: socksOutcome
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SocksOutcomeRequest"
+      responses:
+        '200':
+          description: Успешное внесение прихода, возврат текущего состояния носков (Объект Socks)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Socks"
+        '400':
+          description: Некорректные типы данных в запросе
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exception"
+        '404':
+          description: Не найдены носки, которые подходят под критерии и которых хватает для вывоза в данном количестве
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exception"
+  /:
+    get:
+      summary: Поиск носков по фильтрам
+      tags:
+        - Socks
+      operationId: getSocksBy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetAmountOfFilterSocksRequest"
+      responses:
+        '200':
+          description: Кол-во носков, подходящих по фильтрам
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FilterSocksResponse"
+
+        '400':
+          description: Некорректные типы данных в запросе
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exception"
+  /{id}:
+    put:
+      summary: Обновление информации о носках
+      tags:
+        - Socks
+      operationId: updateSocksBy
+      parameters:
+        - name: id
+          in: path
+          description: Id обновляемых носков
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SocksUpdateRequest"
+      responses:
+        '200':
+          description: Возврат текущего состояния успешно обновлённых носков (Объект Socks)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Socks"
+
+        '400':
+          description: Некорректные данные в запросе
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exception"
+
+        '404':
+          description: Не найдены носки, c данным Id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exception"
+
+  /batch:
+    post:
+      summary: Считывание информации о поставках партий носков из csv файла
+      tags:
+        - Socks
+      operationId: csvBatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CsvBatchRequest"
+      responses:
+        '200':
+          description: Успешное чтение файла
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessFileReadingResponse"
+
+        '400':
+          description: Некорректные данные в запросе
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exception"
+
+        '500':
+          description: Ошибка при чтении файлаД
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exception"
+
+components:
+  schemas:
+    Socks:
+      type: object
+      description: Объект, описывающий определённый тип носков на складе
+      required:
+        - id
+        - cottonPercentage
+        - color
+        - count
+      properties:
+        id:
+          type: integer
+        cottonPercentage:
+          type: integer
+          description: Процентное содержание хлопка(от 0 до 100%)
+        color:
+          type: string
+          description: Цвет носков
+        count:
+          type: integer
+          description: Количество на складе
+    Exception:
+      description: Ответ, когда происходит ошибка
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          description: Http код ошибки
+        message:
+          type: string
+          description: Сообщение об ошибке
+    SocksIncomeRequest:
+      type: object
+      description: Описание партии пришедших носков
+      required:
+        - color
+        - cottonPercentage
+        - count
+      properties:
+        color:
+          type: string
+          description: Цвет носков
+        cottonPercentage:
+          type: integer
+          description: Процентное содержание хлопка(от 0 до 100%, иначе ошибка)
+        count:
+          type: integer
+          description: Количество прибывших носков
+    SocksOutcomeRequest:
+      type: object
+      description: Описание партии отпуска носков
+      required:
+        - color
+        - cottonPercentage
+        - count
+      properties:
+        color:
+          type: string
+          description: Цвет носков
+        cottonPercentage:
+          type: integer
+          description: Процентное содержание хлопка(от 0 до 100%, иначе ошибка)
+        count:
+          type: integer
+          description: Количество отбывших носков
+    GetAmountOfFilterSocksRequest:
+      type: object
+      description: Условия, по которым будет выполнен поиск и расчёт кол-ва носков
+      properties:
+        color:
+          type: string
+          description: Цвет носков
+        colorPercentage:
+          type: integer
+          description: Процентное содержание хлопка(от 0 до 100%, иначе ошибка)
+        countEquals:
+          type: integer
+          description: В выборке будут носки, кол-во которых равно данному параметру
+        countMoreThan:
+          type: integer
+          description: В выборке будут носки, кол-во которых больше данного параметра
+        countLessThan:
+          type: integer
+          description: В выборке будут носки, кол-во которых меньше данного параметра
+    FilterSocksResponse:
+      type: object
+      description: Ответ числом - кол-во носков, подходящих по фильтрам
+      required:
+        - result
+      properties:
+        result:
+          type: integer
+    SocksUpdateRequest:
+      type: object
+      description: Запрос на обновление информации о носках
+      required:
+        - updatingColumn
+        - newValue
+      properties:
+        updatingColumn:
+          type: string
+          description: То, какая информация будет обновляться. Выбор(color, cottonPercentage, count)
+        newValue:
+          type: string
+          description: Значение, которое будет в указанном выше параметре. (Внимание, типы указываемых данных должны соответствовать типам в объекте Socks, иначе вы получите ошибку 400)
+    CsvBatchRequest:
+      type: object
+      description: Запрос на внесение информации о поставках носков, содержащий csv файл
+      required:
+        - csvContent
+      properties:
+        csvContent:
+          type: string
+          format: binary
+          description: Файл с форматом csv
+    SuccessFileReadingResponse:
+      type: object
+      description: Сообщение об успешном чтении файла
+      required:
+        - message
+      properties:
+        message:
+          type: string
